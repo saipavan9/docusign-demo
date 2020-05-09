@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Profile Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/login.css">
+</head>
+<body id="page-top">
+
+
+<section th:replace="nav"></section>
+
+<section style="margin-top:100px">
+	<div class="row d-flex justify-content-center">
+	<form th:action="@{/update}"  method="POST">
+			<h3 style="text-align:center">Profile Page</h3>
+		 <h3 th:if='${status}' th:text='${"Profile updated Sucessfully"}' style='color: green;'></h3>
+		 <h3 th:if='${error}' th:text='${"Profile updation failed"}' style='color: red;'></h3>
+         <div class="form-group ">
+             <label for="firstName">First Name</label>
+                <div class="form-group row">
+                	<div class="col-sm-10">
+                		<input type="text" name="firstName"  class="form-control" th:value="${user.firstName}">
+                	</div>
+                </div>
+            </div>
+              
+              <div class="form-group">
+                <label for="LastName">Last Name</label>
+                <div class="form-group row">
+                	<div class="col-sm-10">
+                		<input type="text" name="lastName" class="form-control" th:value="${user.lastName}">
+                	</div>
+                </div>
+                
+              </div> 
+              <div class="form-group">
+                <label for="email">Email</label>
+                 <div class="form-group row">
+                	<div class="col-sm-10">
+                	<input type="email" name="email" id="email"   class="form-control" th:value="${user.email}">
+                	</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="email">Mobile Number</label>
+                <div class="form-group row">
+                	<div class="col-sm-10">
+                	<input type="text" name="phoneno" class="form-control" th:value="${user.phoneno}">
+                	</div>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="username">Username</label>
+                 <div class="form-group row">
+                	<div class="col-sm-10">
+                	 <input type="text" name="username"  class="form-control" th:value="${user.username}" disabled>
+                	</div>
+                </div>
+                
+                <div class="form-group mb-4">
+                <label for="password">Password</label>
+                    <div class="form-group row">
+                	<div class="col-sm-10">
+                	 <input type="password" name="password" id="password" class="form-control" th:value="${user.password}" disabled>
+                	</div>
+                	<div class="col-sm-5">
+            		</div>
+                </div>
+                
+              </div>
+             
+                          <button class="btn btn-warning login-btn" type="submit">Save Changes</button>    
+              </div>
+
+            </form>
+            </div>
+</section>
+
+</body>
+
+</html>

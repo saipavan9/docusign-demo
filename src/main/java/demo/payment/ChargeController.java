@@ -39,9 +39,6 @@ public class ChargeController {
         
         return "result";
     }
-    
-    @GetMapping("/test")
-    public String gettest() {return "result";}
  
     @ExceptionHandler(StripeException.class)
     public String handleError(Model model, StripeException ex) {
