@@ -1,30 +1,35 @@
 package demo.payment;
 
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import demo.data.ChargeRepository;
 import demo.model.ChargeRequest;
+import demo.model.Charges;
 
 @Controller
 public class PaymentController {
 
 	
-	@GetMapping("/pay")
-	public String getpay() {
-		return "payment";
-	}
-	
+	@Autowired
+	private ChargeRepository chargeRepo;
 	
     @Value("pk_test_mAnugn9yIG8s2vadUs1NH4xz00r9eaMyZi")
     private String stripePublicKey;
  
     @GetMapping("/checkout")
-    public String checkout(Model model) {
-        model.addAttribute("amount", 50 * 100); // in cents
+    public String checkout(Model model,HttpSession session) {
+    	
+    	Charges ch = chargeRepo.findBydocName((String)session.getAttribute("type"));
+        model.addAttribute("amount", ch.getPrice() * 100); // in cents
         model.addAttribute("stripePublicKey", stripePublicKey);
         model.addAttribute("currency", ChargeRequest.Currency.USD);
-        return "payment";
+        model.addAttribute("tax",(ch.getPrice()*0.029)+0.3);
+        return "checkout";
     }
 }

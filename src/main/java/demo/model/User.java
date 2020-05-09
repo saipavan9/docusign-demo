@@ -2,12 +2,16 @@ package demo.model;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -52,6 +56,9 @@ public class User implements UserDetails{
 	
 	@Size(min=10,max=10, message = "Please enter {min} characters.")
 	private final String phoneno;
+	
+//	@OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+//	private List<Role> roles;
 	
 	@Override
 	  public Collection<? extends GrantedAuthority> getAuthorities() {

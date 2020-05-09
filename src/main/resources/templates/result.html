@@ -1,21 +1,62 @@
 <!DOCTYPE html>
 <html xmlns='http://www.w3.org/1999/xhtml' xmlns:th='http://www.thymeleaf.org'>
     <head>
-        <title>Result</title>
+        <title>Payment Confirmation</title>
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     </head>
     <body>
     
     
 <div th:replace="nav"></div>
     
-        <h3 th:if='${error}' th:text='${error}' style='color: red;'></h3>
+    <section style="margin-top:100px">
+    <div class="container">
+    <div class="row d-flex justify-content-center">
+            <h3 th:if='${error}' th:text='${error}' style='color: red;'></h3>
         <div th:unless='${error}'>
             <h3 style='color: green;'>Success!</h3>
-            <div>Id.: <span th:text='${id}' /></div>
-            <div>Status: <span th:text='${status}' /></div>
-            <div>Charge id.: <span th:text='${chargeId}' /></div>
-            <div>Balance transaction id.: <span th:text='${balance_transaction}' /></div>
+    <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Transaction ID:</h6>
+              </div>
+              <span class="text-muted"  th:text='${id}'></span>
+            </li>
+            
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Status</h6>
+              </div>
+              <span class="text-muted" th:text='${status}'></span>
+            </li>
+             <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Charge ID</h6>
+              </div>
+              <span class="text-muted" th:text='${chargeId}'></span>
+            </li>
+            
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Balance Transaction ID</h6>
+              </div>
+              <span class="text-muted" th:text='${balance_transaction}'></span>
+            </li>
+
+          </ul> 
+           <button class="btn btn-warning" style="margin:10px 0 30px 0;"> <a href='/home' style="color:black;text-decoration:none;">Start a new Signing</a></button>  
         </div>
-        <a href='/checkout.html'>Checkout again</a>
+
+        </div>
+        </div>
+       </section> 
+          <!-- Footer -->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">Copyright &copy;Demo Website 2020</p>
+    </div>
+    <!-- /.container -->
+  </footer>
     </body>
    </html>

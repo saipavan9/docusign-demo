@@ -9,11 +9,11 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.view.RedirectView;
+
 
 import com.docusign.esign.api.EnvelopesApi;
 import com.docusign.esign.client.ApiClient;
@@ -26,13 +26,11 @@ import com.docusign.esign.model.Recipients;
 import com.docusign.esign.model.SignHere;
 import com.docusign.esign.model.Signer;
 import com.docusign.esign.model.Tabs;
-import com.docusign.esign.model.TemplateRole;
 import com.docusign.esign.model.ViewUrl;
 import com.sun.jersey.core.util.Base64;
 
 import demo.data.UserRepository;
 import demo.model.User;
-import demo.security.UserRepositoryUserDetailsService;
 
 @Controller
 public class DemoController {
@@ -41,6 +39,7 @@ public class DemoController {
 
 	@Autowired
 	  private static UserRepository userRepo;
+	
 	
 	public DemoController(UserRepository userRepo) {
 		DemoController.userRepo = userRepo;
@@ -69,20 +68,25 @@ public class DemoController {
 		   }else if(formType.equals("lease_violation")) {
 			   docPdf = "LeaseViolationspdf.pdf";
 			   name = "Lease Violation";
-		    }else {
+		    }else if(formType.equals("no_lease")) {
+		    	docPdf = "lease_renewal.pdf";
+		    	name = "Lease Termination";
+		    }
+		    else if(formType.equals("violence")) {
+		    	docPdf = "violence.pdf";
+		    	name = "Lease Termination Due to Violence";
+		    }
+		   else {
 		    	  docPdf = "Eviction-Notice-California.pdf";
 		    	  name = "Other";
 		    }
-		  
-		  System.out.println(formType);
-		  System.out.println(docPdf);
 		  
 		    byte[] buffer = readFile(docPdf);
 	        String docBase64 = new String(Base64.encode(buffer));
 	        
 	        Document document = new Document();
 	        document.setDocumentBase64(docBase64);
-	        document.setName(name+" document");
+	        document.setName(name+" Document");
 	        document.setFileExtension("pdf");
 	        document.setDocumentId("1");
 	        
@@ -92,37 +96,21 @@ public class DemoController {
 	
 	
 	@PostMapping("/sign")
-	public Object create(HttpServletRequest request,Principal principal) throws IOException,ApiException {
-		
-		String formType = request.getParameter("inlineRadioOptions");
-		
-		String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjY4MTg1ZmYxLTRlNTEtNGNlOS1hZjFjLTY4OTgxMjIwMzMxNyJ9.eyJUb2tlblR5cGUiOjUsIklzc3VlSW5zdGFudCI6MTU4ODkxMjgyMSwiZXhwIjoxNTg4OTQxNjIxLCJVc2VySWQiOiJmNGIwYzY4MS1iMGM3LTQzZmMtYjZlNi1hNWIzMDdhYzYyNmMiLCJzaXRlaWQiOjEsInNjcCI6WyJzaWduYXR1cmUiLCJjbGljay5tYW5hZ2UiLCJvcmdhbml6YXRpb25fcmVhZCIsInJvb21fZm9ybXMiLCJncm91cF9yZWFkIiwicGVybWlzc2lvbl9yZWFkIiwidXNlcl9yZWFkIiwidXNlcl93cml0ZSIsImFjY291bnRfcmVhZCIsImRvbWFpbl9yZWFkIiwiaWRlbnRpdHlfcHJvdmlkZXJfcmVhZCIsImR0ci5yb29tcy5yZWFkIiwiZHRyLnJvb21zLndyaXRlIiwiZHRyLmRvY3VtZW50cy5yZWFkIiwiZHRyLmRvY3VtZW50cy53cml0ZSIsImR0ci5wcm9maWxlLnJlYWQiLCJkdHIucHJvZmlsZS53cml0ZSIsImR0ci5jb21wYW55LnJlYWQiLCJkdHIuY29tcGFueS53cml0ZSJdLCJhdWQiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJhenAiOiJmMGYyN2YwZS04NTdkLTRhNzEtYTRkYS0zMmNlY2FlM2E5NzgiLCJpc3MiOiJodHRwczovL2FjY291bnQtZC5kb2N1c2lnbi5jb20vIiwic3ViIjoiZjRiMGM2ODEtYjBjNy00M2ZjLWI2ZTYtYTViMzA3YWM2MjZjIiwiYXV0aF90aW1lIjoxNTg4OTEyNzc2LCJwd2lkIjoiNTIwZDExNDctZDYwMC00YWNmLWE1NGUtY2Q2MWUyYzYxZTdlIn0.fiUEyHrx9KFb4dhs3ncvLw0-69vyUWeMyOAxoVmTBXb08TF7PASn1KnMTbi1U0nMWkd9NjUwGiH4QCAlyC4X9GxWlHQerHb5ixJ_-3fJyCY2-RxpgAEYQWUuUKmKVfPG3Po-6TyGx1Tf9OPHOeqDJTU70zypFLVhiq5nAVTr_ApEljolDesNn7YtmabhQkjJYxoY-zPaWGLO6o6xnMVHaSFFykXfKc-77Z_-JkNZS69jfdITZ4evcDmOaq_GbtvGQ1dqhRr9fd7I_P1vvgSu8HORzB73x-zHD6QPwkMjGGUUZ9YrEw6kxsUfAHwyPhfkd-AYRwqw1DdM6x9RTCL5tQ";
+	public Object create(HttpServletRequest request,Principal principal,@Value("${docusign.oauth.accesstoken}") String accessToken) throws IOException,ApiException {
 	    Long tokenExpirationSeconds = 8 * 60 * 60L;
 	    String accountId = "10403133";
-	    String baseUrl = "http://localhost:8080";
-
-	    
+	    String baseUrl = "http://localhost:8080";	    
 	    String authenticationMethod = "None"; 
 	    
 	    
 	    String basePath = "https://demo.docusign.net/restapi";
-
+	           
+	    String formType = request.getParameter("inlineRadioOptions");
 	    
-	    String docPdf = "Eviction-Notice-California.pdf";
-	    
-//	    byte[] buffer = readFile(docPdf);
-//        String docBase64 = new String(Base64.encode(buffer));
-        
-//        Document document = new Document();
-//        document.setDocumentBase64(docBase64);
-//        document.setName("Demo document");
-//        document.setFileExtension("pdf");
-//        document.setDocumentId("1");
-        
-       
 	    Document document = getDoc(formType);
         Signer signer = createSigner(principal);
         
+        request.getSession().setAttribute("type", document.getName());
         
         SignHere signHere = new SignHere();
         signHere.setDocumentId("1");
@@ -159,7 +147,7 @@ public class DemoController {
         
         RecipientViewRequest viewRequest = new RecipientViewRequest();
 
-        viewRequest.setReturnUrl(baseUrl + "/home");
+        viewRequest.setReturnUrl(baseUrl + "/checkout");
         viewRequest.setAuthenticationMethod(authenticationMethod);
         viewRequest.setEmail(signer.getEmail());
         viewRequest.setUserName(signer.getName());
@@ -186,6 +174,8 @@ public class DemoController {
         buffer.flush();
         return buffer.toByteArray();
     }
+    
+    
 	
 	
 }
