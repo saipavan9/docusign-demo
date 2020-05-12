@@ -22,7 +22,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-lg-8 mx-auto">
-			
+			<h3 th:if='${error}' th:text='${error}' style='color: red;'></h3>
 			<h2>Please Choose one of the following</h2>
 			<form action="/sign" method=POST>
 			<div class="form-check form-check-inline">

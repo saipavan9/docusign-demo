@@ -46,6 +46,11 @@ public class DemoController {
 		
 	}
 	  
+	@Value("${${docusign.baseurl}}")
+	private String baseUrl;
+	
+	@Value("${docusign.oauth.accesstoken}") 
+	String accessToken;
 
 	private static Signer createSigner(Principal principal) {
 		
@@ -96,10 +101,9 @@ public class DemoController {
 	
 	
 	@PostMapping("/sign")
-	public Object create(HttpServletRequest request,Principal principal,@Value("${docusign.oauth.accesstoken}") String accessToken) throws IOException,ApiException {
+	public Object create(HttpServletRequest request,Principal principal) throws IOException,ApiException {
 	    Long tokenExpirationSeconds = 8 * 60 * 60L;
 	    String accountId = "10403133";
-	    String baseUrl = "http://localhost:8080";	    
 	    String authenticationMethod = "None"; 
 	    
 	    
@@ -146,8 +150,9 @@ public class DemoController {
 
         
         RecipientViewRequest viewRequest = new RecipientViewRequest();
-
-        viewRequest.setReturnUrl(baseUrl + "/checkout");
+//
+//        viewRequest.setReturnUrl("http://35.193.30.60:8080/checkout");
+        viewRequest.setReturnUrl("http://localhost:8080/checkout");
         viewRequest.setAuthenticationMethod(authenticationMethod);
         viewRequest.setEmail(signer.getEmail());
         viewRequest.setUserName(signer.getName());
@@ -155,6 +160,7 @@ public class DemoController {
         // call the CreateRecipientView API
         ViewUrl results1 = envelopesApi.createRecipientView(accountId, envelopeId, viewRequest);
         
+        request.getSession().setAttribute("envelopId", envelopeId);
         
         String redirectUrl = results1.getUrl();
         RedirectView redirect = new RedirectView(redirectUrl);
